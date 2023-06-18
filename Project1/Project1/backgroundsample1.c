@@ -3,36 +3,43 @@
 #include <conio.h>
 #include <time.h> 
 
-#define COLOR_RESET	"\033[0m" // ∏Æº¬
-#define COLOR_WHITE	"\033[48;2;255;255;255m" // »Úªˆ
-#define COLOR_GRAY	"\033[48;2;186;195;198m" // »∏ªˆ
-#define COLOR_BLACK	"\033[48;2;0;0;0m" // ∞Àªˆ
-#define COLOR_APRICOT	"\033[48;2;252;221;199m"       // ªÏ±∏ªˆ
-#define COLOR_DARK_SKIN "\033[48;2;191;144;120m"      // ««∫Œ ∏Ìæœ
-#define COLOR_ORANGE "\033[48;2;255;139;51m"            // ¡÷»≤ªˆ
+#include <stdlib.h> // rand() Ìï®Ïàò Ìè¨Ìï® ÎùºÏù¥Î∏åÎü¨Î¶¨
+
+#define COLOR_RESET	"\033[0m" // Î¶¨ÏÖã
+#define COLOR_WHITE	"\033[48;2;255;255;255m" // Ìù∞ÏÉâ
+#define COLOR_GRAY	"\033[48;2;186;195;198m" // ÌöåÏÉâ
+#define COLOR_BLACK	"\033[48;2;0;0;0m" // Í≤ÄÏÉâ
+#define COLOR_APRICOT	"\033[48;2;252;221;199m"       // ÏÇ¥Íµ¨ÏÉâ
+#define COLOR_DARK_SKIN "\033[48;2;191;144;120m"      // ÌîºÎ∂Ä Î™ÖÏïî
+#define COLOR_ORANGE "\033[48;2;255;139;51m"            // Ï£ºÌô©ÏÉâ
 
 
-#define COLOR_BLOACK1	"\033[48;2;100;100;100m" // »∏ªˆ1
-#define COLOR_BLOACK2	"\033[48;2;141;141;141m" // »∏ªˆ2
-#define COLOR_BLOACK3	"\033[48;2;153;153;153m" // »∏ªˆ3
-#define COLOR_BLOACK4	"\033[48;2;172;172;172m" // »∏ªˆ4
+#define COLOR_BLOACK1	"\033[48;2;100;100;100m" // ÌöåÏÉâ1
+#define COLOR_BLOACK2	"\033[48;2;141;141;141m" // ÌöåÏÉâ2
+#define COLOR_BLOACK3	"\033[48;2;153;153;153m" // ÌöåÏÉâ3
+#define COLOR_BLOACK4	"\033[48;2;172;172;172m" // ÌöåÏÉâ4
+
+#define COLOR_BLOACKTACK	"\033[48;2;228;255;0m" // ÎÖ∏ÎûÄÏÉâ
 
 #define SCR_HEIGHT 60
 #define SCR_WIDTH 100
+
+#define PLAYER_LOACATION 5
 
 char main_background[SCR_HEIGHT][SCR_WIDTH] = { '0', };
 
 char front_buffer[SCR_HEIGHT][SCR_WIDTH];
 char back_buffer[SCR_HEIGHT][SCR_WIDTH];
 
+int stair[16] = {0, 0, 0, 0, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1};
 
-char mainstair[6][11] = {
-	{"44444444444"},
-	{"46676666674"},
-	{"46746666664"},
-	{"46666774654"},
-	{"47766667764"},
-	{"44444444444"},
+int player_dir = 1;
+
+char mainstair[4][9] = {
+	{"444444444"},
+	{"466766654"},
+	{"467466764"},
+	{"444444444"},
 };
 
 char mainchar_1[16][16] = {
@@ -81,13 +88,13 @@ char mainchar_3[16][16] = {
 	{"0013333333331000"},
 	{"0001333333311000"},
 	{"0000123332110000"},
-	{"0000133333100000"},
 	{"0000133333110000"},
 	{"0001333333331000"},
 	{"0013332111111000"},
 	{"0001111000000000"},
-	{"0000000000000000"},
-	{"0000000000000000"},
+	{"0080000000000000"},
+	{"0888000000000000"},
+	{"0080000000000000"},
 };
 char mainchar_4[16][16] = {
 	{"0000000000000000"},
@@ -105,7 +112,7 @@ char mainchar_4[16][16] = {
 	{"0000133333100000"},
 	{"0001331123100000"},
 	{"0000110013100000"},
-	{"0000000001100000"},
+	{"0080000001100000"},
 };
 
 
@@ -120,6 +127,8 @@ void print_bloack();
 void test();
 void drawAll();
 void print_character(int scene);
+
+void print_character_left(int scene);
 void moveCursorTo(const int x, const int y);
 int key;
 
@@ -171,6 +180,10 @@ void render()
 				{
 					printf("%s  %s", COLOR_BLOACK4, COLOR_RESET);
 				}
+				else if (back_buffer[i][j] == '8')
+				{
+					printf("%s  %s", COLOR_BLOACKTACK, COLOR_RESET);
+				}
 				
 			}
 			a += 2;
@@ -217,7 +230,26 @@ void characterrender()
 				{
 					printf("%s  %s", COLOR_GRAY, COLOR_RESET);
 				}
-
+				else if (back_buffer[22+i][42+j] == '4')
+				{
+					printf("%s  %s", COLOR_BLOACK1, COLOR_RESET);
+				}
+				else if (back_buffer[22 + i][42 + j] == '5')
+				{
+					printf("%s  %s", COLOR_BLOACK2, COLOR_RESET);
+				}
+				else if (back_buffer[22 + i][42 + j] == '6')
+				{
+					printf("%s  %s", COLOR_BLOACK3, COLOR_RESET);
+				}
+				else if (back_buffer[22+i][42 + j] == '7')
+				{
+					printf("%s  %s", COLOR_BLOACK4, COLOR_RESET);
+				}
+				else if (back_buffer[22 + i][42 + j] == '8')
+				{
+					printf("%s  %s", COLOR_BLOACKTACK, COLOR_RESET);
+				}
 			}
 			a += 2;
 		}
@@ -248,29 +280,98 @@ int main()
 	while (1)
 	{
 		InputKey();
+
+
 		print_bloack();
-		print_character(1);
+		if (player_dir == 1)
+		{
+			print_character(1);
+		}
+		if (player_dir == 2)
+		{
+			print_character_left(1);
+		}
 		render();
 	}
 		
 	
 }
 
-void drawAll()
+void up()
 {
+	int random_block;
+	for (int i = 0; i < 15; i++)
+	{
+		stair[i] = stair[i + 1];
 
+	}
+
+	srand(time(NULL));
+	random_block = rand() % 2 + 1; // ÎÇúÏàò ÏÉùÏÑ±
+	stair[15] = random_block;
 }
 
 
 void print_bloack()
 {
-	for (int h = 0; h < 6; h++)
+	int n = 38;
+	int m = 45;
+	for (int i = 5; i < 17; i++)
 	{
-		for (int w = 0; w < 11; w++)
+		if (stair[i] != 0)
 		{
-			drawToBackBuffer(h + 38, 44 + w, mainstair[h][w]);
+			for (int h = 0; h < 4; h++)
+			{
+				for (int w = 0; w < 9; w++)
+				{
+					if (m+w < 100 && m + w > 0)
+					{
+						drawToBackBuffer(h + n, m + w, mainstair[h][w]);
+					}
+
+				}
+			}
+			n -= 4;
+			if (stair[i] == 1)
+			{
+				m += 9;
+
+			}
+			else if (stair[i] == 2)
+			{
+				m -= 9;
+			}
+		}
+		
+	}
+	n = 38;
+	m = 45;
+	for (int i = 4; i >= 0; i--)
+	{
+		if (stair[i] != 0)
+		{
+			if (stair[i] == 1)
+			{
+				m -= 9;
+
+			}
+
+			if (stair[i] == 2)
+			{
+				m += 9;
+
+			}
+			n += 4;
+			for (int h = 0; h < 4; h++)
+			{
+				for (int w = 0; w < 9; w++)
+				{
+					drawToBackBuffer(h + n, m + w, mainstair[h][w]);
+				}
+			}
 		}
 	}
+	
 }
 
 
@@ -286,22 +387,64 @@ void InputKey() {
 		key = _getch();
 		switch (key) {
 		case 32: // space
-			print_character(1);
-			characterrender();
-			Sleep(100);
-			print_character(2);
-			characterrender();
-			Sleep(100);
-			print_character(3);
-			characterrender();
-			Sleep(100);
-			print_character(4);
-			characterrender();
-			Sleep(100);
+
+			
 			break;
 		case 75: // left
+			if (stair[PLAYER_LOACATION] == 2)
+			{
+				player_dir = 2;
+				print_bloack();
+				print_character_left(1);
+				characterrender();
+
+				Sleep(10);
+
+				print_bloack();
+				print_character_left(2);
+				characterrender();
+				Sleep(10);
+
+				up();
+
+				print_bloack();
+				print_character_left(3);
+				render(); 
+				Sleep(10);
+
+				print_bloack();
+				print_character_left(4);
+				characterrender();
+				Sleep(10);
+			}
+			
 			break;
 		case 77: // right
+			if (stair[PLAYER_LOACATION] == 1)
+			{
+
+				player_dir = 1;
+				print_bloack();
+				print_character(1);
+				characterrender();
+				Sleep(10);
+
+				print_bloack();
+				print_character(2);
+				characterrender();
+				Sleep(10);
+				up();
+
+				print_bloack();
+				print_character(3);
+				render();
+				Sleep(10);
+
+				print_bloack();
+				print_character(4);
+				characterrender();
+				Sleep(10);
+			}
 			break;
 		case 80: // down
 			break;
@@ -364,7 +507,10 @@ void print_character(int scene)
 		{
 			for (int w = 0; w < 16; w++)
 			{
-				drawToBackBuffer(22 + h, 42 + w, mainchar_1[h][w]);
+				if (mainchar_1[h][w] != '0')
+				{
+					drawToBackBuffer(22 + h, 42 + w, mainchar_1[h][w]);
+				}
 			}
 		}
 	}
@@ -374,8 +520,10 @@ void print_character(int scene)
 		{
 			for (int w = 0; w < 16; w++)
 			{
-
-				drawToBackBuffer(22 + h, 42 + w, mainchar_2[h][w]);
+				if (mainchar_2[h][w] != '0')
+				{
+					drawToBackBuffer(22 + h, 42 + w, mainchar_2[h][w]);
+				}
 			}
 		}
 	}
@@ -386,7 +534,10 @@ void print_character(int scene)
 			for (int w = 0; w < 16; w++)
 			{
 
-				drawToBackBuffer(22 + h, 42 + w, mainchar_3[h][w]);
+				if (mainchar_3[h][w] != '0')
+				{
+					drawToBackBuffer(22 + h, 42 + w, mainchar_3[h][w]);
+				}
 			}
 		}
 	}
@@ -396,7 +547,76 @@ void print_character(int scene)
 		{
 			for (int w = 0; w < 16; w++)
 			{
-				drawToBackBuffer(22 + h, 42 + w, mainchar_4[h][w]);
+
+				if (mainchar_4[h][w] != '0')
+				{
+
+					drawToBackBuffer(22 + h, 42 + w, mainchar_4[h][w]);
+				}
+			}
+		}
+	}
+
+}
+
+
+void print_character_left(int scene)
+{
+	if (scene == 1)
+	{
+		for (int h = 15; h >= 0; h--)
+		{
+			for (int w = 15; w >= 0; w--)
+			{
+				if (mainchar_1[h][w] != '0')
+				{
+					drawToBackBuffer(22 + h, 56 - w, mainchar_1[h][w]);
+				}
+			}
+		}
+	}
+	else if (scene == 2)
+	{
+
+		for (int h = 15; h >= 0; h--)
+		{
+			for (int w = 15; w >= 0; w--)
+			{
+				if (mainchar_2[h][w] != '0')
+				{
+					drawToBackBuffer(22 + h, 56 - w, mainchar_2[h][w]);
+				}
+			}
+		}
+	}
+	else if (scene == 3)
+	{
+
+		for (int h = 15; h >= 0; h--)
+		{
+			for (int w = 15; w >= 0; w--)
+			{
+
+				if (mainchar_3[h][w] != '0')
+				{
+					drawToBackBuffer(22 + h, 56 - w, mainchar_3[h][w]);
+				}
+			}
+		}
+	}
+	else if (scene == 4)
+	{
+
+		for (int h = 15; h >= 0; h--)
+		{
+			for (int w = 15; w >= 0; w--)
+			{
+
+				if (mainchar_4[h][w] != '0')
+				{
+
+					drawToBackBuffer(22 + h, 56 - w, mainchar_4[h][w]);
+				}
 			}
 		}
 	}
